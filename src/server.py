@@ -19,6 +19,8 @@ MCP_SERVER_URL = os.environ.get(
     "https://mcp-hello-py-666155174404.asia-northeast3.run.app/mcp"
 )
 
+SERVICE_URL = os.environ.get("SERVICE_URL", "")
+
 
 def create_agent_card(host: str, port: int) -> AgentCard:
     """Create the A2A Agent Card."""
@@ -34,10 +36,15 @@ def create_agent_card(host: str, port: int) -> AgentCard:
         ],
     )
 
+    if SERVICE_URL:
+        agent_url = SERVICE_URL
+    else:
+        agent_url = f"http://{host}:{port}/"
+
     return AgentCard(
         name="Hello MCP Agent",
         description="MCP Hello Server를 사용하여 한국어로 인사하는 A2A 에이전트입니다.",
-        url=f"http://{host}:{port}/",
+        url=agent_url,
         version="1.0.0",
         default_input_modes=["text"],
         default_output_modes=["text"],
@@ -65,7 +72,7 @@ def main():
 
     print(f"Starting A2A Hello MCP Agent on {host}:{port}")
     print(f"MCP Server URL: {MCP_SERVER_URL}")
-    print(f"Agent Card URL: http://{host}:{port}/.well-known/agent.json")
+    print(f"Service URL: {SERVICE_URL or f'http://{host}:{port}/'}")
 
     uvicorn.run(server.build(), host=host, port=port)
 
