@@ -58,3 +58,19 @@ class MCPHelloClient:
                     }
                     for tool in tools.tools
                 ]
+
+    async def get_exchange_rate(self, date: str) -> str:
+        async with streamablehttp_client(self.mcp_url) as (read, write, _):
+            async with ClientSession(read, write) as session:
+                await session.initialize()
+
+                result = await session.call_tool(
+                    "get_exchange_rate",
+                    arguments={"date": date}
+                )
+
+                if result.content and len(result.content) > 0:
+                    c = result.content[0]
+                    if hasattr(c, "text"):
+                        return c.text
+                return "환율을 받지 못했습니다."

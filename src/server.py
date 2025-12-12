@@ -28,7 +28,7 @@ def create_agent_card(host: str, port: int) -> AgentCard:
         id="exchange rates",
         name="Exchange Rates",
         description="날짜를 받아 주요국의 환율을 반환합니다. MCP Hello Server를 사용합니다.",
-        tags=["exchange rates", "korean", "mcp"],
+        tags=["exchange rates", "krw", "usd", "jpy", "eur", "mcp"],
         examples=[
             "20220101",
             "20241225",

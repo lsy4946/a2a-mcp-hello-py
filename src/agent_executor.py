@@ -32,7 +32,7 @@ class HelloMCPAgentExecutor(AgentExecutor):
                     break
 
         if not user_message:
-            user_message = "친구"
+            user_message = datetime.now().strftime("%Y%m%d")
 
         task = context.current_task or new_task(context.message)
         await event_queue.enqueue_event(task)
@@ -43,7 +43,7 @@ class HelloMCPAgentExecutor(AgentExecutor):
             await updater.update_status(
                 TaskState.working,
                 new_agent_text_message(
-                    "MCP 서버에 인사 요청 중...",
+                    "MCP 서버에 환율 조회 중...",
                     task.context_id,
                     task.id
                 ),
