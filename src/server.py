@@ -16,7 +16,7 @@ from agent_executor import HelloMCPAgentExecutor  # type: ignore
 
 MCP_SERVER_URL = os.environ.get(
     "MCP_SERVER_URL",
-    "https://mcp-hello-py-666155174404.asia-northeast3.run.app/mcp"
+    "https://mcp-hello-py-49835033306.asia-northeast3.run.app/mcp"
 )
 
 SERVICE_URL = os.environ.get("SERVICE_URL", "")
@@ -25,14 +25,14 @@ SERVICE_URL = os.environ.get("SERVICE_URL", "")
 def create_agent_card(host: str, port: int) -> AgentCard:
     """Create the A2A Agent Card."""
     skill = AgentSkill(
-        id="korean_greeting",
-        name="Korean Greeting",
-        description="이름을 받아 한국어로 인사합니다. MCP Hello Server를 사용합니다.",
-        tags=["greeting", "korean", "mcp"],
+        id="exchange rates",
+        name="Exchange Rates",
+        description="날짜를 받아 주요국의 환율을 반환합니다. MCP Hello Server를 사용합니다.",
+        tags=["exchange rates", "korean", "mcp"],
         examples=[
-            "김철수에게 인사해줘",
-            "이영희, 박민수에게 인사해줘",
-            "안녕하세요",
+            "20220101",
+            "20241225",
+            "20251212",
         ],
     )
 
@@ -43,7 +43,7 @@ def create_agent_card(host: str, port: int) -> AgentCard:
 
     return AgentCard(
         name="Hello MCP Agent",
-        description="MCP Hello Server를 사용하여 한국어로 인사하는 A2A 에이전트입니다.",
+        description="MCP Hello Server를 사용하여 날짜를 받아 주요국의 환율을 반환하는 A2A 에이전트입니다.",
         url=agent_url,
         version="1.0.0",
         default_input_modes=["text"],
