@@ -1,78 +1,53 @@
-"""MCP Client for calling MCP Hello Server."""
-
-from mcp import ClientSession  # type: ignore
-from mcp.client.streamable_http import streamablehttp_client  # type: ignore
+import httpx
 
 
 class MCPHelloClient:
-    """Client to interact with MCP Hello Server."""
-
     def __init__(self, mcp_url: str):
         self.mcp_url = mcp_url
 
+    async def call_tool(self, name: str, arguments: dict) -> str:
+        payload = {
+            "jsonrpc": "2.0",
+            "id": 1,
+            "method": "tools/call",
+            "params": {
+                "name": name,
+                "arguments": arguments,
+            },
+        }
+
+        async with httpx.AsyncClient(timeout=15.0) as client:
+            r = await client.post(
+                self.mcp_url,
+                headers={
+                    "Content-Type": "application/json",
+                    "Accept": "application/json",
+                },
+                json=payload,
+            )
+
+        r.raise_for_status()
+        data = r.json()
+
+        try:
+            return data["result"]["content"][0]["text"]
+        except Exception:
+            return str(data)[:2000]
+
     async def get_exchange_rate(self, date: str) -> str:
-        async with streamablehttp_client(self.mcp_url) as (read, write, _):
-            async with ClientSession(read, write) as session:
-                await session.initialize()
-
-                result = await session.call_tool(
-                    "get_exchange_rate",
-                    arguments={"date": date}
-                )
-
-                if result.content and len(result.content) > 0:
-                    c = result.content[0]
-                    if hasattr(c, "text"):
-                        return c.text
-                return "환율을 받지 못했습니다."
+        return await self.call_tool(
+            "get_exchange_rate",
+            {"date": date},
+        )
 
     async def say_hello(self, name: str) -> str:
-        """Call the say_hello tool on MCP server."""
-        async with streamablehttp_client(self.mcp_url) as (read, write, _):
-            async with ClientSession(read, write) as session:
-                await session.initialize()
-
-                result = await session.call_tool(
-                    "say_hello",
-                    arguments={"name": name}
-                )
-
-                if result.content and len(result.content) > 0:
-                    content = result.content[0]
-                    if hasattr(content, 'text'):
-                        return content.text
-                return "인사를 받지 못했습니다."
+        return await self.call_tool(
+            "say_hello",
+            {"name": name},
+        )
 
     async def say_hello_multiple(self, names: list[str]) -> str:
-        """Call the say_hello_multiple tool on MCP server."""
-        async with streamablehttp_client(self.mcp_url) as (read, write, _):
-            async with ClientSession(read, write) as session:
-                await session.initialize()
-
-                result = await session.call_tool(
-                    "say_hello_multiple",
-                    arguments={"names": names}
-                )
-
-                if result.content and len(result.content) > 0:
-                    content = result.content[0]
-                    if hasattr(content, 'text'):
-                        return content.text
-                return "인사를 받지 못했습니다."
-
-    async def list_tools(self) -> list[dict]:
-        """List available tools from MCP server."""
-        async with streamablehttp_client(self.mcp_url) as (read, write, _):
-            async with ClientSession(read, write) as session:
-                await session.initialize()
-
-                tools = await session.list_tools()
-                return [
-                    {
-                        "name": tool.name,
-                        "description": tool.description
-                    }
-                    for tool in tools.tools
-                ]
-
-    
+        return await self.call_tool(
+            "say_hello_multiple",
+            {"names": names},
+        )
