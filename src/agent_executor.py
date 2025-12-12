@@ -20,11 +20,15 @@ class HelloMCPAgentExecutor(AgentExecutor):
         event_queue: EventQueue,
     ) -> None:
         """Execute the agent with user input."""
-        user_message = ""
-        if context.message and context.message.parts:
+        user_message = context.get_user_input() if hasattr(context, 'get_user_input') else ""
+        
+        if not user_message and context.message and context.message.parts:
             for part in context.message.parts:
                 if hasattr(part, 'text'):
                     user_message = part.text
+                    break
+                elif hasattr(part, 'root') and hasattr(part.root, 'text'):
+                    user_message = part.root.text
                     break
 
         if not user_message:
